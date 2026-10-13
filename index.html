@@ -63,12 +63,12 @@ footer{border-top:1px solid var(--line);padding:28px 0;color:var(--muted);font-s
 <script>
 const WHATSAPP = "5511980942111";
 const products = [
- {id:"v55",name:"Ignite V55",detail:"5.500 puffs",price:75,tag:"ATACADO",image:"https://www.ignitevape.shop/descartaveis/v55/",flavors:[["Morango com Kiwi",1],["Uva Ice",2],["Morango com Melancia",2],["Melancia Ice",2],["Icy Mint",1]]},
- {id:"v80",name:"Ignite V80",detail:"8.000 puffs",price:82,tag:"",image:"https://www.ignitevape.shop/descartaveis/v80/",flavors:[["Uva Ice",1],["Morango com Kiwi",3],["Icy Mint",3]]},
- {id:"v155",name:"Ignite V155 Ultra Slim",detail:"15.500 puffs",price:85,tag:"",image:"https://www.ignitevape.shop/descartaveis/v155/",flavors:[["Uva Ice",2],["Melancia Ice",1],["Morango com Melancia",1],["Menta",2],["Abacaxi Ice",1]]},
- {id:"frozen",name:"Ignite Frozen",detail:"20.000 puffs",price:90,tag:"",image:"https://www.ignitevape.shop/descartaveis/frozen/",flavors:[["Melancia Ice",2],["Morango Ice",3],["Morango com Kiwi",2],["Uva Ice",2],["Icy Mint",3],["Menta",1]]},
- {id:"elfbar15",name:"Elfbar BC 15K",detail:"15.000 puffs",price:75,tag:"",image:"https://aracitypods.com.br/",flavors:[["Icy Mint",1],["Melancia Ice",1],["Morango com Melancia",2]]},
- {id:"elfbar30",name:"Elfbar TE 30K",detail:"30.000 puffs",price:92,tag:"",image:"https://aracitypods.com.br/",flavors:[["Melancia Ice",2],["Morango Ice",2]]}
+ {id:"v55",name:"Ignite V55",detail:"5.500 puffs",price:75,tag:"ATACADO",image:"",flavors:[["Morango com Kiwi",1],["Uva Ice",2],["Morango com Melancia",2],["Melancia Ice",2],["Icy Mint",1]]},
+ {id:"v80",name:"Ignite V80",detail:"8.000 puffs",price:82,tag:"",image:"",flavors:[["Uva Ice",1],["Morango com Kiwi",3],["Icy Mint",3]]},
+ {id:"v155",name:"Ignite V155 Ultra Slim",detail:"15.500 puffs",price:85,tag:"",image:"",flavors:[["Uva Ice",2],["Melancia Ice",1],["Morango com Melancia",1],["Menta",2],["Abacaxi Ice",1]]},
+ {id:"frozen",name:"Ignite Frozen",detail:"20.000 puffs",price:90,tag:"",image:"",flavors:[["Melancia Ice",2],["Morango Ice",3],["Morango com Kiwi",2],["Uva Ice",2],["Icy Mint",3],["Menta",1]]},
+ {id:"elfbar15",name:"Elfbar BC 15K",detail:"15.000 puffs",price:75,tag:"",image:"",flavors:[["Icy Mint",1],["Melancia Ice",1],["Morango com Melancia",2]]},
+ {id:"elfbar30",name:"Elfbar TE 30K",detail:"30.000 puffs",price:92,tag:"",image:"",flavors:[["Melancia Ice",2],["Morango Ice",2]]}
 ];
 const cart = new Map();
 const fmt = n => n.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
@@ -81,7 +81,7 @@ function renderProducts(){
  grid.innerHTML=list.length?list.map(p=>`<article class="product"><div class="product-art">${p.tag?`<span class="tag">${p.tag}</span>`:""}<img src="${p.image}" alt="${p.name}" loading="lazy" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="glyph" style="display:none">▰</span></div><div class="product-info"><h3>${p.name}</h3><div class="detail">${p.detail}</div><div class="price">${fmt(p.price)}</div><label class="flavor-label" for="flavor-${p.id}">Sabor e estoque</label><select class="flavor-select" id="flavor-${p.id}" data-flavor="${p.id}">${p.flavors.map((f,i)=>`<option value="${i}">${f[0]} — ${f[1]} disponível(is)</option>`).join("")}</select><div class="detail" style="margin:8px 0 12px">Estoque total: ${p.flavors.reduce((sum,f)=>sum+f[1],0)} un.</div><button class="add" data-add="${p.id}">＋ Adicionar à sacola</button></div></article>`).join(""):`<div class="empty">Nenhum produto encontrado. Tente outra busca.</div>`;
  grid.querySelectorAll("[data-add]").forEach(b=>b.addEventListener("click",()=>{const p=products.find(x=>x.id===b.dataset.add);const sel=grid.querySelector('[data-flavor="'+p.id+'"]');add(p.id,Number(sel.value));}));
 }
-function add(id){cart.set(id,(cart.get(id)||0)+1);renderCart();showToast(); }
+function add(id,flavorIndex){const p=products.find(x=>x.id===id);const flavor=p.flavors[flavorIndex];const key=id+"::"+flavor[0];const current=cart.get(key)||0;if(current>=flavor[1]){showToast("Estoque máximo desse sabor atingido");return;}cart.set(key,current+1);renderCart();showToast("Adicionado: "+flavor[0]);}
 function change(key,delta){const [id,flavorName]=key.split("::");const p=products.find(x=>x.id===id);const flavor=p.flavors.find(f=>f[0]===flavorName);let q=(cart.get(key)||0)+delta;if(q<=0)cart.delete(key);else if(q<=flavor[1])cart.set(key,q);renderCart();}
 function removeItem(key){cart.delete(key);renderCart();}
 function renderCart(){
